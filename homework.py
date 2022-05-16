@@ -1,8 +1,9 @@
 from dataclasses import dataclass, asdict
 from typing import Union
 
+
 @dataclass
-class InfoMessage :
+class InfoMessage:
     """Информационное сообщение о тренировке."""
     training_type: str
     duration: float
@@ -19,7 +20,8 @@ class InfoMessage :
     def get_message(self) -> str:
         return self.MESSAGE.format(**asdict(self))
 
-class Training :
+
+class Training:
     """Базовый класс тренировки."""
     M_IN_KM: int = 1000
     MIN_IN_H: int = 60
@@ -63,8 +65,9 @@ class Running(Training):
     def get_spent_calories(self) -> float:
         coeff_calorie_1: int = 18
         coeff_calorie_2: int = 20
-        calories = ((coeff_calorie_1 * self.get_mean_speed() - coeff_calorie_2) * self.weight) / (
-        self.M_IN_KM) * (self.duration * self.MIN_IN_H)
+        calories = ((coeff_calorie_1 * self.get_mean_speed()
+        - coeff_calorie_2) * self.weight) / (self.M_IN_KM) * (
+        self.duration * self.MIN_IN_H)
         return calories
 
 
@@ -83,35 +86,36 @@ class SportsWalking(Training):
     def get_spent_calories(self) -> float:
         walking_coef_1: float = 0.035
         walking_coef_2: float = 0.029
-        calories = (walking_coef_1 * 
-        self.weight+(self.get_mean_speed()**2//self.height)*
-        walking_coef_2 * self.weight)* (self.duration * self.MIN_IN_H)
+        calories = (walking_coef_1
+        * self.weight + (self.get_mean_speed() ** 2 // self.height)
+        * walking_coef_2 * self.weight) * (self.duration * self.MIN_IN_H)
         return calories
 
 
 class Swimming(Training):
     """Тренировка: плавание."""
     LEN_STEP: float = 1.38
-    def __init__(self, 
+
+    def __init__(self,
                 action: int,
                 duration: float,
                 weight: float,
                 length_pool: int,
-                count_pool: int
-                ) -> None:
+                count_pool: int) -> None:
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
 
     def get_mean_speed(self) -> float:
-        speed = speed = (self.length_pool * 
-        self.count_pool) / self.M_IN_KM / self.duration
+        speed = speed = (
+        self.length_pool * self.count_pool) / self.M_IN_KM / self.duration
         return speed
 
     def get_spent_calories(self) -> float:
         calories_coef: float = 1.1
         calories = (self.get_mean_speed() + calories_coef) * 2 * self.weight
         return calories
+
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
