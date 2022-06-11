@@ -22,9 +22,9 @@ class InfoMessage:
 
 class Training:
     """Базовый класс тренировки."""
-    M_IN_KM: ClassVar[int] = 1000
-    MIN_IN_H: ClassVar[int] = 60
-    LEN_STEP: ClassVar[float] = 0.65
+    M_IN_KM: int = 1000
+    MIN_IN_H: int = 60
+    LEN_STEP: float = 0.65
 
     def __init__(self, action: int, duration: float,
                  weight: float) -> None:
@@ -42,7 +42,8 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError(
+            'Определите метод get_spent_calories в %s.' % (self.__class__.__name__))
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -53,8 +54,8 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
-    COEFF_CALORIE_1: ClassVar[int] = 18
-    COEFF_CALORIE_2: ClassVar[int] = 20
+    COEFF_CALORIE_1: int = 18
+    COEFF_CALORIE_2: int = 20
 
     def get_spent_calories(self) -> float:
         return (((self.COEFF_CALORIE_1 * self.get_mean_speed()
@@ -64,8 +65,8 @@ class Running(Training):
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
-    WALKING_COEF_1: ClassVar[float] = 0.035
-    WALKING_COEF_2: ClassVar[float] = 0.029
+    WALKING_COEF_1: float = 0.035
+    WALKING_COEF_2: float = 0.029
 
     def __init__(self, action: int, duration: float,
                  weight: float, height: float) -> None:
@@ -81,8 +82,8 @@ class SportsWalking(Training):
 
 class Swimming(Training):
     """Тренировка: плавание."""
-    LEN_STEP: ClassVar[float] = 1.38
-    CALORIES_COEF: ClassVar[float] = 1.1
+    LEN_STEP: float = 1.38
+    CALORIES_COEF: float = 1.1
 
     def __init__(self, action: int, duration: float,
                  weight: float, length_pool: int,
@@ -103,12 +104,10 @@ def read_package(workout_type: str, data: Iterable[int]) -> Training:
     """Прочитать данные полученные от датчиков."""
     type_dict: dict[str, Type[Training]] = {
         'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
-    for key, value in type_dict.items():
-        if key == workout_type:
-            try:
-                return value(*data)
-            except (NameError, ValueError):
-                print('No data for such training type')
+    try:
+        return type_dict[workout_type](*data)
+    except (NameError, ValueError):
+        print('No data for such training type')
 
 
 def main(training: Training) -> None:
