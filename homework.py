@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import Iterable, Type, ClassVar, List
+from typing import Iterable, Type, ClassVar
 
 
 @dataclass
@@ -32,21 +32,17 @@ class Training:
         self.duration = duration
         self.weight = weight
 
-
     def get_distance(self) -> float:
         """Получить дистанцию в км."""
         return self.action * self.LEN_STEP / self.M_IN_KM
-
 
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения."""
         return self.get_distance() / self.duration
 
-
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
         pass
-
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -61,8 +57,9 @@ class Running(Training):
     COEFF_CALORIE_2: ClassVar[int] = 20
 
     def get_spent_calories(self) -> float:
-        return ((self.COEFF_CALORIE_1 * self.get_mean_speed() - self.COEFF_CALORIE_2)
-                * self.weight) / (self.M_IN_KM) * (self.duration * self.MIN_IN_H)
+        return (((self.COEFF_CALORIE_1 * self.get_mean_speed()
+                - self.COEFF_CALORIE_2) * self.weight) / (self.M_IN_KM)
+                * (self.duration * self.MIN_IN_H))
 
 
 class SportsWalking(Training):
@@ -75,13 +72,11 @@ class SportsWalking(Training):
         super().__init__(action, duration, weight)
         self.height = height
 
-
     def get_spent_calories(self) -> float:
         """Считаем количество потраченных каллорий при спорт. ходьбе"""
-        return (self.WALKING_COEF_1 * self.weight + (
-                    self.get_mean_speed() ** 2 // self.height)
-                    * self.WALKING_COEF_2 * self.weight) * (
-                    self.duration * self.MIN_IN_H)
+        return ((self.WALKING_COEF_1 * self.weight + (self.get_mean_speed()
+                ** 2 // self.height) * self.WALKING_COEF_2 * self.weight)
+                * (self.duration * self.MIN_IN_H))
 
 
 class Swimming(Training):
@@ -96,10 +91,9 @@ class Swimming(Training):
         self.length_pool = length_pool
         self.count_pool = count_pool
 
-
     def get_mean_speed(self) -> float:
-        return (self.length_pool * self.count_pool) / self.M_IN_KM / self.duration
-
+        return ((self.length_pool * self.count_pool)
+                / self.M_IN_KM / self.duration)
 
     def get_spent_calories(self) -> float:
         return (self.get_mean_speed() + self.CALORIES_COEF) * 2 * self.weight
@@ -113,8 +107,8 @@ def read_package(workout_type: str, data: Iterable[int]) -> Training:
         if key == workout_type:
             try:
                 return value(*data)
-            except (NameError):
-                print ('No data for such training type')
+            except (NameError, ValueError):
+                print('No data for such training type')
 
 
 def main(training: Training) -> None:
@@ -125,7 +119,7 @@ def main(training: Training) -> None:
 
 if __name__ == '__main__':
     packages = [('SWM', [720, 1, 80, 25, 40]),
-                ('RUN', [15000, 1, 75]), ('WLK', [9000, 1, 75, 180]),]
+                ('RUN', [15000, 1, 75]), ('WLK', [9000, 1, 75, 180])]
     for workout_type, data in packages:
         training = read_package(workout_type, data)
         main(training)
